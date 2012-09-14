@@ -4,7 +4,7 @@ module OmniAuth
   module Strategies
     class Canvas < OmniAuth::Strategies::OAuth2
 
-      option :name, "Canvas"
+      option :name, "canvas"
 
       option :client_options, {
         :site           => "https://canvas.instructure.com",
