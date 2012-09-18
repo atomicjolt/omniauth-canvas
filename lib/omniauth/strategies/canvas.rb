@@ -27,7 +27,7 @@ module OmniAuth
           'title' => raw_info['title'],
           'nickname' => raw_info['login_id'],
           'active_avatar' => raw_info['avatar_url'],
-          'token' => access_token.token,
+          'url' => access_token.client.site
         }
       end
 
