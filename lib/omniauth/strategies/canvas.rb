@@ -11,6 +11,9 @@ module OmniAuth
         :authorize_url  => "/login/oauth2/auth",
         :token_url      => "/login/oauth2/token"
       }
+
+      option :provider_ignores_state, true
+
       option :token_params, {
         :parse          => :json
       }
