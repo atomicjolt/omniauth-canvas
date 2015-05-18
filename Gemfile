@@ -14,6 +14,5 @@ group :development, :test do
   gem 'growl'
   gem 'rb-fsevent'
   gem 'simplecov'
-  gem 'debugger'
   gem 'rack-test'
 end
