@@ -41,7 +41,7 @@ module OmniAuth
       def raw_info
         @raw_info ||= access_token.get("/api/v1/users/#{access_token['user']['id']}/profile").parsed
       end
-      
+
       def query_string
         ''
       end
