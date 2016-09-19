@@ -11,21 +11,25 @@ authenticate with http://canvas.instructure.com. To dynamically set the canvas s
 
 ## Standard setup:
 
-  # NOTE that you will need to set env['rack.session']['oauth_site'] to the current Canvas instance that you wish to OAuth with. By default this is https://canvas.instructure.com
+  # NOTE that you will need to set `env['rack.session']['oauth_site']` to the current Canvas instance that you wish to OAuth with. By default this is https://canvas.instructure.com
 
+  ```ruby
   use OmniAuth::Builder do
     provider :canvas, :setup => lambda{|env|
       request = Rack::Request.new(env)
       env['omniauth.strategy'].options[:client_options].site = env['rack.session']['oauth_site']
     }
   end
+  ```
 
 ## Setup with Devise:
 
+  ```ruby
   config.omniauth :canvas, 'canvas_key', 'canvas_secret', :setup => lambda{|env|
     request = Rack::Request.new(env)
     env['omniauth.strategy'].options[:client_options].site = env['rack.session']['oauth_site']
   }
+  ```
 
 ## License
 
