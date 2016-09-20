@@ -7,31 +7,57 @@ http://www.OpenTapestry.com to Instructure Canvas.
 
 # Setup
 Contact Instructure or your Canvas administrator to get an OAuth key and secret. By default omniauth-canvas will attempt to
-authenticate with http://canvas.instructure.com. To dynamically set the canvas site url do the following:
+authenticate with http://canvas.instructure.com. 
 
-## Standard setup:
+**NOTE**: you will need to set `env['rack.session']['oauth_site']` to the current Canvas instance that you wish to OAuth with. By default this is https://canvas.instructure.com
 
-  # NOTE that you will need to set `env['rack.session']['oauth_site']` to the current Canvas instance that you wish to OAuth with. By default this is https://canvas.instructure.com
+To dynamically set the canvas site url do one of the following.
 
-  ```ruby
-  use OmniAuth::Builder do
-    provider :canvas, :setup => lambda{|env|
-      request = Rack::Request.new(env)
-      env['omniauth.strategy'].options[:client_options].site = env['rack.session']['oauth_site']
-    }
-  end
-  ```
+## Standard setup
 
-## Setup with Devise:
-
-  ```ruby
-  config.omniauth :canvas, 'canvas_key', 'canvas_secret', :setup => lambda{|env|
+```ruby
+use OmniAuth::Builder do
+  provider :canvas, 'canvas_key', 'canvas_secret', :setup => lambda{|env|
     request = Rack::Request.new(env)
     env['omniauth.strategy'].options[:client_options].site = env['rack.session']['oauth_site']
   }
-  ```
+end
+```
 
-## License
+## Setup with Devise
+
+```ruby
+config.omniauth :canvas, 'canvas_key', 'canvas_secret', :setup => lambda{|env|
+  request = Rack::Request.new(env)
+  env['omniauth.strategy'].options[:client_options].site = env['rack.session']['oauth_site']
+}
+```
+
+## Alernative Setup
+
+In this setup, you do not have to set `env['rack.session']['oauth_site']`
+
+```ruby
+Rails.application.config.middleware.use OmniAuth::Builder do
+  provider :canvas, APP_CONFIG['canvas_client_id'], APP_CONFIG['canvas_client_secret'],
+  {
+    :client_options => {
+      :site => APP_CONFIG['canvas_host']
+    }
+  }
+end
+```
+  
+
+# Canvas Configuration
+
+If you are running your own installation of canvas, you can generate a client ID
+and secret in the Site Admin account of your Canvas install. There will be a
+"Developer Keys" tab on the left navigation sidebar. For more information,
+consult the [Canvas OAuth Documentation](https://canvas.instructure.com/doc/api/file.oauth.html)
+
+
+# License
 
 Copyright (C) 2012-2016 by Justin Ball and Atomic Jolt.
 
