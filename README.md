@@ -9,20 +9,20 @@ http://www.OpenTapestry.com to Instructure Canvas.
 Contact Instructure or your Canvas administrator to get an OAuth key and secret. By default omniauth-canvas will attempt to
 authenticate with http://canvas.instructure.com. To dynamically set the canvas site url do the following:
 
-## Standard setup:
+## Standard setup
 
   # NOTE that you will need to set `env['rack.session']['oauth_site']` to the current Canvas instance that you wish to OAuth with. By default this is https://canvas.instructure.com
 
   ```ruby
   use OmniAuth::Builder do
-    provider :canvas, :setup => lambda{|env|
+    provider :canvas, 'canvas_key', 'canvas_secret', :setup => lambda{|env|
       request = Rack::Request.new(env)
       env['omniauth.strategy'].options[:client_options].site = env['rack.session']['oauth_site']
     }
   end
   ```
 
-## Setup with Devise:
+## Setup with Devise
 
   ```ruby
   config.omniauth :canvas, 'canvas_key', 'canvas_secret', :setup => lambda{|env|
@@ -30,6 +30,14 @@ authenticate with http://canvas.instructure.com. To dynamically set the canvas s
     env['omniauth.strategy'].options[:client_options].site = env['rack.session']['oauth_site']
   }
   ```
+
+## Canvas Configuration
+
+If you are running your own installation of canvas, you can generate a client ID
+and secret in the Site Admin account of your Canvas install. There will be a
+"Developer Keys" tab on the left navigation sidebar. For more information,
+consult the [Canvas OAuth Documentation](https://canvas.instructure.com/doc/api/file.oauth.html)
+
 
 ## License
 
