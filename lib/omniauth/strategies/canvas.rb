@@ -39,6 +39,9 @@ module OmniAuth
         @raw_info ||= access_token.get("/api/v1/users/#{access_token['user']['id']}/profile").parsed
       end
 
+      # Passing any query string value to Canvas will result in:
+      # redirect_uri does not match client settings
+      # so we set the value to empty string
       def query_string
         ""
       end
