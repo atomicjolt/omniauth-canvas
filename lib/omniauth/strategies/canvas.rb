@@ -45,6 +45,19 @@ module OmniAuth
       def query_string
         ""
       end
+
+      # Override authorize_params so that we can be deliberate about setting state if needed
+      def authorize_params
+        # Only set state if it hasn't already been set
+        options.authorize_params[:state] ||= SecureRandom.hex(24)
+        params = options.authorize_params.merge(options_for("authorize"))
+        if OmniAuth.config.test_mode
+          @env ||= {}
+          @env["rack.session"] ||= {}
+        end
+        session["omniauth.state"] = params[:state]
+        params
+      end
     end
   end
 end
