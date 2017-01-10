@@ -1,4 +1,4 @@
-# OmniAuth Canvas
+# OmniAuth Canvas [![Build Status](https://travis-ci.org/atomicjolt/omniauth-canvas.svg?branch=master)](https://travis-ci.org/atomicjolt/omniauth-canvas)
 Gem to authenticate with Instructure Canvas via OAuth2
 
 # Background
