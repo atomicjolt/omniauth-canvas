@@ -28,12 +28,5 @@ services:
 install:
   - bundle install --path vendor/bundle
 
-before_script:
-  - export CHROME_BIN=chromium-browser
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
-  - bundle exec rake db:create
-  - bundle exec rake db:schema:load
-
 script:
   - rspec
