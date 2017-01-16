@@ -27,6 +27,6 @@ services:
 
 install:
   - bundle install
-  
+
 script:
   - rspec
