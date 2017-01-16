@@ -36,5 +36,4 @@ before_script:
   - bundle exec rake db:schema:load
 
 script:
-  - set -e
-  - bundle exec rake
+  - rspec
