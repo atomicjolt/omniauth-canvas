@@ -3,6 +3,7 @@ require "omniauth-oauth2"
 module OmniAuth
   module Strategies
     class Canvas < OmniAuth::Strategies::OAuth2
+
       option :name, "canvas"
 
       option :client_options,
@@ -10,7 +11,9 @@ module OmniAuth
              authorize_url: "/login/oauth2/auth",
              token_url:     "/login/oauth2/token"
 
-      option :provider_ignores_state, false
+      # Canvas does use state but we want to control it rather than letting
+      # omniauth-oauth2 handle it.
+      option :provider_ignores_state, true
 
       option :token_params,
              parse: :json
@@ -46,7 +49,9 @@ module OmniAuth
         ""
       end
 
-      # Override authorize_params so that we can be deliberate about setting state if needed
+      # Override authorize_params so that we can be deliberate about the value for state
+      # and not use the session which is unavailable inside of an iframe for some
+      # browsers (ie Safari)
       def authorize_params
         # Only set state if it hasn't already been set
         options.authorize_params[:state] ||= SecureRandom.hex(24)
@@ -55,9 +60,9 @@ module OmniAuth
           @env ||= {}
           @env["rack.session"] ||= {}
         end
-        session["omniauth.state"] = params[:state]
         params
       end
+
     end
   end
 end

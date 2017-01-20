@@ -2,16 +2,19 @@
 Gem to authenticate with Instructure Canvas via OAuth2
 
 # Background
-OmniAuth Canvas grew out of the need to simplify the process of setting up LTI and connecting a user account on
-http://www.OpenTapestry.com to Instructure Canvas.
+OmniAuth Canvas grew out of the need to simplify the process of setting up LTI
+and connecting a user account on http://www.OpenTapestry.com to Instructure Canvas.
 
 # Setup
-Contact Instructure or your Canvas administrator to get an OAuth key and secret. By default omniauth-canvas will attempt to
-authenticate with http://canvas.instructure.com. 
+Contact Instructure or your Canvas administrator to get an OAuth key and secret.
+By default omniauth-canvas will attempt to authenticate with http://canvas.instructure.com.
 
-**NOTE**: you will need to set `env['rack.session']['oauth_site']` to the current Canvas instance that you wish to OAuth with. By default this is https://canvas.instructure.com
+**NOTE**: you will need to set `env['rack.session']['oauth_site']` to the current
+Canvas instance that you wish to OAuth with. By default this is https://canvas.instructure.com
 
-To dynamically set the canvas site url do one of the following.
+-- OR --
+
+to dynamically set the canvas site url do one of the following.
 
 ## Standard setup
 
@@ -33,7 +36,7 @@ config.omniauth :canvas, 'canvas_key', 'canvas_secret', :setup => lambda{|env|
 }
 ```
 
-## Alernative Setup
+## Alternative Setup
 
 In this setup, you do not have to set `env['rack.session']['oauth_site']`
 
@@ -47,7 +50,7 @@ Rails.application.config.middleware.use OmniAuth::Builder do
   }
 end
 ```
-  
+
 
 # Canvas Configuration
 
@@ -57,9 +60,76 @@ and secret in the Site Admin account of your Canvas install. There will be a
 consult the [Canvas OAuth Documentation](https://canvas.instructure.com/doc/api/file.oauth.html)
 
 
+# State
+
+In most cases your application will need to restore state after handling the OAuth process
+with Canvas. Since many applications that integrate with Canvas will be launched via the LTI
+protocol inside of an iframe sessions may not be available. To restore application state the
+omniauth-canvas gem uses the "state" parameter provided by the LTI proctocol. You will need
+to add the following code to your application to take advantage of this functionality:
+
+
+Add the following initializer in `config/initializers/omniauth.rb`:
+
+```ruby
+OmniAuth.config.before_request_phase do |env|
+  request = Rack::Request.new(env)
+  state = "#{SecureRandom.hex(24)}#{DateTime.now.to_i}"
+  OauthState.create!(state: state, payload: request.params.to_json)
+  env["omniauth.strategy"].options[:authorize_params].state = state
+
+  # Bye default omniauth will store all params in the session. The code above
+  # stores the values in the database so we remove the values from the session
+  # since the amount of data in the original params object will overflow the
+  # allowed cookie size
+  env["rack.session"].delete("omniauth.params")
+end
+```
+
+Add the following middleware to `lib/middlware/oauth_state_middleware.rb`:
+
+```ruby
+class OauthStateMiddleware
+  def initialize(app)
+    @app = app
+  end
+
+  def call(env)
+    request = Rack::Request.new(env)
+    if request.params["state"] && request.params["code"]
+      if oauth_state = OauthState.find_by(state: request.params["state"])
+        # Restore the param from before the OAuth dance
+        state_params = JSON.parse(oauth_state.payload) || {}
+        state_params.each do |key, value|
+          request.update_param(key, value)
+        end
+        application_instance = ApplicationInstance.find_by(lti_key: state_params["oauth_consumer_key"])
+        env["canvas.url"] = application_instance.lti_consumer_uri
+        oauth_state.destroy
+      else
+        raise OauthStateMiddlewareException, "Invalid state in OAuth callback"
+      end
+    end
+    @app.call(env)
+  end
+end
+
+class OauthStateMiddlewareException < RuntimeError
+end
+```
+
+
+Last, enable the middleware by adding the following to `config/application.rb`:
+
+```ruby
+# Middleware that can restore state after an OAuth request
+config.middleware.insert_before 0, "OauthStateMiddleware"
+```
+
+
 # License
 
-Copyright (C) 2012-2016 by Justin Ball and Atomic Jolt.
+Copyright (C) 2012-2017 by Justin Ball and Atomic Jolt.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
