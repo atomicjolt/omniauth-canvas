@@ -3,7 +3,13 @@ Gem to authenticate with Instructure Canvas via OAuth2
 
 # Background
 OmniAuth Canvas grew out of the need to simplify the process of setting up LTI
-and connecting a user account on http://www.OpenTapestry.com to Instructure Canvas.
+and connecting a user account on to Instructure Canvas on various projects built by
+[Atomic Jolt](http://www.atomicjolt.com).
+
+# Example
+[Atomic Jolt](http://www.atomicjolt.com) has created an LTI started application that demonstrates
+how to use the OAuth gem:
+[LTI Starter App](https://github.com/atomicjolt/lti_starter_app)
 
 # Setup
 Contact Instructure or your Canvas administrator to get an OAuth key and secret.
@@ -118,6 +124,35 @@ class OauthStateMiddlewareException < RuntimeError
 end
 ```
 
+This middleware relies upon two models - OauthState and ApplicationInstance. OauthState is used to
+store relevant state before sending the user to Canvas to finish the OAuth. ApplicationInstance is
+model used in Atomic Jolt projects that is used to store the Canvas Url so that it can be reset in
+the environment. You don't need to implement the same model, but you will need to store the user's
+Canvas URL somewhere before sending the user to OAuth with Canvas. Change the following lines in the
+above code to recover the Canvas URL from where ever it is stored:
+
+```
+application_instance = ApplicationInstance.find_by(lti_key: state_params["oauth_consumer_key"])
+env["canvas.url"] = application_instance.lti_consumer_uri
+```
+
+The OauthState model looks like this:
+```
+class OauthState < ActiveRecord::Base
+  validates :state, presence: true, uniqueness: true
+end
+```
+
+With the following schema:
+```
+create_table "oauth_states", force: :cascade do |t|
+  t.string   "state"
+  t.text     "payload"
+  t.datetime "created_at", null: false
+  t.datetime "updated_at", null: false
+  t.index ["state"], name: "index_oauth_states_on_state", using: :btree
+end
+```
 
 Last, enable the middleware by adding the following to `config/application.rb`:
 
