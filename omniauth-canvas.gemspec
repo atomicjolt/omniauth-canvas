@@ -8,7 +8,7 @@ Gem::Specification.new do |gem|
   gem.name          = "omniauth-canvas"
   gem.version       = OmniAuth::Canvas::VERSION
   gem.authors       = "Justin Ball"
-  gem.email         = "justin@atomicjolt.com"
+  gem.email         = "justin.ball@atomicjolt.com"
   gem.description   = "OmniAuth Oauth2 strategy for Instructure Canvas."
   gem.summary       = "OmniAuth Oauth2 strategy for Instructure Canvas."
   gem.homepage      = "https://github.com/atomicjolt/omniauth-canvas"
@@ -21,8 +21,8 @@ Gem::Specification.new do |gem|
 
   gem.require_paths = ["lib"]
 
-  gem.add_dependency "omniauth", "~> 1.3.1"
-  gem.add_dependency "omniauth-oauth2", "~> 1.4.0"
+  gem.add_dependency "omniauth", "~> 1.3"
+  gem.add_dependency "omniauth-oauth2", "~> 1.4"
 
   gem.add_development_dependency "rake"
   gem.add_development_dependency "rack-test"
