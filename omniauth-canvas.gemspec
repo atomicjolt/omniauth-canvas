@@ -14,15 +14,15 @@ Gem::Specification.new do |gem|
   gem.homepage      = "https://github.com/atomicjolt/omniauth-canvas"
   gem.license       = "MIT"
 
-  gem.required_ruby_version = ">= 2.0"
+  gem.required_ruby_version = ">= 2.5"
 
   gem.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
   gem.test_files = Dir["test/**/*"]
 
   gem.require_paths = ["lib"]
 
-  gem.add_dependency "omniauth", "~> 1.3"
-  gem.add_dependency "omniauth-oauth2", "~> 1.4"
+  gem.add_dependency "omniauth", "~> 2.0"
+  gem.add_dependency "omniauth-oauth2", "~> 1.8"
 
   gem.add_development_dependency "rake"
   gem.add_development_dependency "rack-test"
